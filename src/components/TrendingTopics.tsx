@@ -15,7 +15,7 @@ interface TrendingTopic {
 }
 
 const TrendingTopics = () => {
-  const { t, language, isRTL } = useLanguage();
+  const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [topics, setTopics] = useState<TrendingTopic[]>([]);
   const [timeRange, setTimeRange] = useState<"hour" | "day" | "week">("day");

@@ -3,11 +3,12 @@ import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Download, Share2 
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { useLanguage } from "@/hooks/useLanguage";
+import { getText, MultilingualText } from "@/types/multilingual";
 
 interface Podcast {
   id: string;
-  title: { ur: string; en: string };
-  description: { ur: string; en: string };
+  title: MultilingualText;
+  description: MultilingualText;
   audioUrl: string;
   duration: string;
   durationInSeconds: number;
@@ -30,7 +31,7 @@ const AudioPlayer = ({
   showControls = true,
   variant = "full" 
 }: AudioPlayerProps) => {
-  const { t, language, isRTL } = useLanguage();
+  const { t, language } = useLanguage();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [currentTime, setCurrentTime] = useState(0);
@@ -140,15 +141,14 @@ const AudioPlayer = ({
     if (navigator.share) {
       try {
         await navigator.share({
-          title: podcast.title[language],
-          text: podcast.description[language],
+          title: getText(podcast.title, language),
+          text: getText(podcast.description, language),
           url: window.location.href
         });
       } catch (error) {
         console.log('Share cancelled or failed:', error);
       }
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
     }
   };
@@ -173,7 +173,7 @@ const AudioPlayer = ({
         </Button>
         <div className="flex-1">
           <h4 className="text-sm font-medium line-clamp-1">
-            {podcast.title[language]}
+            {getText(podcast.title, language)}
           </h4>
           <p className="text-xs text-muted-foreground">
             {formatTime(currentTime)} / {formatTime(duration)}
@@ -189,17 +189,17 @@ const AudioPlayer = ({
         {podcast.imageUrl && (
           <img
             src={podcast.imageUrl}
-            alt={podcast.title[language]}
+            alt={getText(podcast.title, language)}
             className="w-16 h-16 rounded-lg object-cover"
           />
         )}
         
         <div className="flex-1">
           <h4 className="font-medium line-clamp-1">
-            {podcast.title[language]}
+            {getText(podcast.title, language)}
           </h4>
           <p className="text-sm text-muted-foreground line-clamp-2">
-            {podcast.description[language]}
+            {getText(podcast.description, language)}
           </p>
           <div className="flex items-center gap-2 mt-1">
             <span className="text-xs text-muted-foreground">
@@ -244,17 +244,17 @@ const AudioPlayer = ({
         {podcast.imageUrl && (
           <img
             src={podcast.imageUrl}
-            alt={podcast.title[language]}
+            alt={getText(podcast.title, language)}
             className="w-24 h-24 rounded-lg object-cover"
           />
         )}
         
         <div className="flex-1">
           <h3 className="text-lg font-semibold mb-2">
-            {podcast.title[language]}
+            {getText(podcast.title, language)}
           </h3>
           <p className="text-muted-foreground mb-2">
-            {podcast.description[language]}
+            {getText(podcast.description, language)}
           </p>
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             {podcast.speaker && (

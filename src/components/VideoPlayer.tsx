@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, VolumeX, Maximize, SkipBack, SkipForward } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { useLanguage } from "@/hooks/useLanguage";
 
 interface VideoPlayerProps {
   src: string;
@@ -12,7 +11,6 @@ interface VideoPlayerProps {
 }
 
 const VideoPlayer = ({ src, thumbnail, title, className = "" }: VideoPlayerProps) => {
-  const { t, isRTL } = useLanguage();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);

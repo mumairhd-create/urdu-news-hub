@@ -8,7 +8,6 @@ import TrendingTopics from "@/components/TrendingTopics";
 import { database, NewsArticle, Category } from "@/lib/database";
 import { useInfiniteData } from "@/hooks/useInfiniteScroll";
 import { useLanguage } from "@/hooks/useLanguage";
-import { Search } from "lucide-react";
 import { Article } from "@/data/articles";
 
 const Articles = () => {
@@ -17,7 +16,7 @@ const Articles = () => {
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const { t, isRTL, language } = useLanguage();
+  const { t, language } = useLanguage();
   
   const selectedCategory = searchParams.get("category") || "all";
   const currentCategory = categories.find(cat => cat.name === selectedCategory);
@@ -68,8 +67,8 @@ const Articles = () => {
 
   const filteredArticles = useMemo(() => {
     return convertedArticles.filter((article) => {
-      const articleTitle = article.title[language];
-      const articleExcerpt = article.excerpt[language];
+      const articleTitle = article.title[language] || article.title.ur;
+      const articleExcerpt = article.excerpt[language] || article.excerpt.ur;
       const matchesSearch =
         articleTitle.includes(searchQuery) ||
         articleExcerpt.includes(searchQuery);
@@ -96,7 +95,6 @@ const Articles = () => {
     data,
     isLoading,
     error,
-    fetchNextPage,
     resetData
   } = useInfiniteData(convertedArticles, fetchArticles);
 
@@ -111,11 +109,6 @@ const Articles = () => {
       searchParams.set("category", categoryId);
     }
     setSearchParams(searchParams);
-  };
-
-  const getCategoryName = (categoryName: string) => {
-    const category = categories.find(cat => cat.name === categoryName);
-    return category ? category.name : categoryName;
   };
 
   return (
@@ -147,7 +140,7 @@ const Articles = () => {
               )}
 
               {/* No Results */}
-              {!isLoading && data.items.length === 0 && (
+              {!isLoading && !loading && data.items.length === 0 && (
                 <div className="text-center py-16">
                   <p className="text-lg text-muted-foreground mb-4">{t("noArticlesFound")}</p>
                   <button onClick={() => { setSearchQuery(""); handleCategoryChange("all"); }} className="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:bg-primary/90">{t("clearFilters")}</button>
@@ -155,7 +148,7 @@ const Articles = () => {
               )}
 
               {/* Loading Indicator */}
-              {isLoading && (
+              {(isLoading || loading) && (
                 <div className="text-center py-8">
                   <div className="inline-flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />

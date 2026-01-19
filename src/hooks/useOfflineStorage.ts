@@ -14,7 +14,6 @@ interface OfflineArticle {
 }
 
 const OFFLINE_STORAGE_KEY = 'urdu-news-hub-offline-articles';
-const OFFLINE_VERSION_KEY = 'urdu-news-hub-offline-version';
 
 export const useOfflineStorage = () => {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
