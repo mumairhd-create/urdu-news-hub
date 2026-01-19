@@ -2,10 +2,12 @@ import { useState, useEffect, useMemo } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ArticleCard from "@/components/ArticleCard";
+import { ArticleCardSkeleton, CategorySkeleton } from "@/components/ui/skeleton";
 import { database, NewsArticle, Category } from "@/lib/database";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Play, AlertTriangle } from "lucide-react";
 import { useLanguage } from "@/hooks/useLanguage";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const { t, isRTL, language } = useLanguage();
@@ -78,7 +80,7 @@ const Index = () => {
         setError(null);
         
         const [articlesData, categoriesData] = await Promise.all([
-          database.getNewsArticles({ limit: 20 }),
+          database.getNewsArticles({ limit: 20, featured: true }),
           database.getCategories()
         ]);
         
@@ -86,7 +88,7 @@ const Index = () => {
         setCategories(categoriesData);
       } catch (error) {
         console.error('Error loading data:', error);
-        setError('Failed to load data. Please try again later.');
+        setError(error instanceof Error ? error.message : 'Failed to load data. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -95,34 +97,96 @@ const Index = () => {
     loadData();
   }, []);
 
+  const handleRetry = () => {
+    window.location.reload();
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">{t("loading") || "Loading..."}</p>
-        </div>
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 main-content-with-header">
+          <div className="container mx-auto py-6">
+            {/* Featured Section Skeleton */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+              <div className="lg:col-span-2">
+                <ArticleCardSkeleton variant="featured" />
+              </div>
+              <div className="space-y-4">
+                <div className="h-6 bg-muted rounded animate-pulse mb-4"></div>
+                {Array.from({ length: 3 }, (_, i) => (
+                  <ArticleCardSkeleton key={i} variant="small" />
+                ))}
+              </div>
+            </div>
+            
+            {/* Categories Skeleton */}
+            <div className="bg-secondary py-6 mb-8">
+              <CategorySkeleton />
+            </div>
+            
+            {/* Articles Grid Skeleton */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+              <div className="lg:col-span-8">
+                <div className="mb-10">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="h-6 bg-muted rounded w-32 animate-pulse"></div>
+                    <div className="h-4 bg-muted rounded w-20 animate-pulse"></div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {Array.from({ length: 4 }, (_, i) => (
+                      <ArticleCardSkeleton key={i} variant="medium" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              <aside className="lg:col-span-4">
+                <div className="space-y-8">
+                  {Array.from({ length: 3 }, (_, i) => (
+                    <div key={i} className="space-y-4">
+                      <div className="h-6 bg-muted rounded w-24 animate-pulse"></div>
+                      <div className="space-y-3">
+                        {Array.from({ length: 5 }, (_, j) => (
+                          <ArticleCardSkeleton key={j} variant="list" />
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </aside>
+            </div>
+          </div>
+        </main>
+        <Footer />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-red-500 mb-4">
-            <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+      <div className="min-h-screen flex flex-col bg-background">
+        <Header />
+        <main className="flex-1 main-content-with-header flex items-center justify-center">
+          <div className="text-center max-w-md mx-auto p-6">
+            <div className="text-destructive mb-6">
+              <AlertTriangle className="h-16 w-16 mx-auto" />
+            </div>
+            <h2 className="text-2xl font-bold text-foreground mb-4">
+              {t("errorTitle") || "Something went wrong"}
+            </h2>
+            <p className="text-muted-foreground mb-6">{error}</p>
+            <div className="flex gap-3 justify-center">
+              <Button onClick={handleRetry} className="flex items-center gap-2">
+                <ChevronIcon className="h-4 w-4" />
+                {t("retry") || "Retry"}
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/">{t("home") || "Home"}</Link>
+              </Button>
+            </div>
           </div>
-          <p className="text-red-600 mb-4">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
-            className="px-4 py-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 transition-colors"
-          >
-            {t("retry") || "Retry"}
-          </button>
-        </div>
+        </main>
+        <Footer />
       </div>
     );
   }
