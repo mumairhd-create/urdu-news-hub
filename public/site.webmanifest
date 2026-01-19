@@ -1,0 +1,16 @@
+{
+  "name": "عمر میڈیا - Umar Media",
+  "short_name": "عمر میڈیا",
+  "description": "پاکستان کا سب سے بڑا اردو نیوز پورٹل۔ تازہ ترین خبریں، سیاسی تجزیے، کھیل، تفریح، ٹیکنالوجی اور کاروباری خبریں۔",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#dc2626",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
