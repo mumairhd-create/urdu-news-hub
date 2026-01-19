@@ -3,11 +3,12 @@ import { Play, Eye, Clock } from "lucide-react";
 import VideoPlayer from "./VideoPlayer";
 import { useLanguage } from "@/hooks/useLanguage";
 import LazyImage from "@/components/LazyImage";
+import { getText, MultilingualText } from "@/types/multilingual";
 
 interface Video {
   id: string;
-  title: { ur: string; en: string };
-  description: { ur: string; en: string };
+  title: MultilingualText;
+  description: MultilingualText;
   thumbnail: string;
   videoUrl: string;
   duration: string;
@@ -23,7 +24,7 @@ interface VideoCardProps {
 }
 
 const VideoCard = ({ video, variant = "default", autoPlay = false }: VideoCardProps) => {
-  const { t, language, isRTL } = useLanguage();
+  const { t, language } = useLanguage();
   const [isPlaying, setIsPlaying] = useState(autoPlay);
 
   const handlePlay = () => {
@@ -40,7 +41,7 @@ const VideoCard = ({ video, variant = "default", autoPlay = false }: VideoCardPr
         <VideoPlayer
           src={video.videoUrl}
           thumbnail={video.thumbnail}
-          title={video.title[language]}
+          title={getText(video.title, language)}
           className="w-full aspect-video"
         />
         <button
@@ -67,7 +68,7 @@ const VideoCard = ({ video, variant = "default", autoPlay = false }: VideoCardPr
         {/* Thumbnail */}
         <LazyImage
           src={video.thumbnail}
-          alt={video.title[language]}
+          alt={getText(video.title, language)}
           className="w-full h-full object-cover"
         />
         
@@ -75,10 +76,10 @@ const VideoCard = ({ video, variant = "default", autoPlay = false }: VideoCardPr
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="absolute bottom-0 left-0 right-0 p-4">
             <h3 className="text-white font-semibold text-sm mb-1 line-clamp-2">
-              {video.title[language]}
+              {getText(video.title, language)}
             </h3>
             <p className="text-white/80 text-xs line-clamp-2">
-              {video.description[language]}
+              {getText(video.description, language)}
             </p>
           </div>
         </div>
@@ -117,7 +118,7 @@ const VideoCard = ({ video, variant = "default", autoPlay = false }: VideoCardPr
       {variant === "compact" && (
         <div className="p-3">
           <h3 className="font-semibold text-sm mb-1 line-clamp-2">
-            {video.title[language]}
+            {getText(video.title, language)}
           </h3>
           <div className="flex items-center gap-3 text-muted-foreground text-xs">
             <span>{video.views.toLocaleString()} views</span>

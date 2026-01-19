@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { useLanguage } from '@/hooks/useLanguage'
 import { database, Category } from '@/lib/database'
-import { Plus, Edit, Trash2, FolderOpen, ChevronRight, ChevronDown } from 'lucide-react'
+import { Plus, Edit, Trash2, FolderOpen, ChevronDown } from 'lucide-react'
 
 interface CategoryFormData {
   name: { ur: string; en: string; ps?: string }
@@ -20,7 +20,6 @@ interface CategoryFormData {
 export function CategoryManager() {
   const { language } = useLanguage()
   const [categories, setCategories] = useState<Category[]>([])
-  const [subcategories, setSubcategories] = useState<Category[]>([])
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
@@ -256,69 +255,123 @@ export function CategoryManager() {
             </div>
           </DialogContent>
         </Dialog>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {categories.map(category => (
-            <Card key={category.id} className="relative">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle className="text-lg">
-                      {category.name[language as keyof typeof category.name] || category.name.en}
-                    </CardTitle>
-                    <CardDescription className="text-sm text-gray-600">
-                      {category.description && (category.description[language as keyof typeof category.description] || category.description.en)}
-                    </CardDescription>
-                  </div>
-                  <div className="flex space-x-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleEdit(category)}
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDelete(category.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+      {/* Edit Dialog */}
+      <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>
+              {language === 'ur' ? 'زمرہ ترمیم کریں' : 'Edit Category'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Urdu */}
+            <div className="space-y-2 p-4 bg-gray-50 rounded">
+              <h3 className="font-medium text-gray-900">اردو</h3>
+              <div>
+                <Label htmlFor="edit_name_ur">نام</Label>
+                <Input
+                  id="edit_name_ur"
+                  value={formData.name.ur}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    name: { ...formData.name, ur: e.target.value } 
+                  })}
+                  dir="rtl"
+                />
+              </div>
+            </div>
+            
+            {/* English */}
+            <div className="space-y-2 p-4 bg-gray-50 rounded">
+              <h3 className="font-medium text-gray-900">English</h3>
+              <div>
+                <Label htmlFor="edit_name_en">Name</Label>
+                <Input
+                  id="edit_name_en"
+                  value={formData.name.en}
+                  onChange={(e) => setFormData({ 
+                    ...formData, 
+                    name: { ...formData.name, en: e.target.value } 
+                  })}
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setIsEditOpen(false)}>
+                {language === 'ur' ? 'منسوخ کریں' : 'Cancel'}
+              </Button>
+              <Button onClick={handleSubmit}>
+                {language === 'ur' ? 'اپڈیٹ کریں' : 'Update'}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {categories.map(category => (
+          <Card key={category.id} className="relative">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-lg">
+                    {category.name[language as keyof typeof category.name] || category.name.en}
+                  </CardTitle>
+                  <CardDescription className="text-sm text-gray-600">
+                    {category.description && (category.description[language as keyof typeof category.description] || category.description.en)}
+                  </CardDescription>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center space-x-2 text-sm text-gray-500">
-                  <Badge variant="secondary">
-                    {getSubcategories(category.id).length} {language === 'ur' ? 'ذیلیے زمرہ' : 'subcategories'}
-                  </Badge>
-                  {getSubcategories(category.id).length > 0 && (
-                    <ChevronDown className="h-4 w-4" />
-                  )}
+                <div className="flex space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleEdit(category)}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDelete(category.id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
-                
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center space-x-2 text-sm text-gray-500">
+                <Badge variant="secondary">
+                  {getSubcategories(category.id).length} {language === 'ur' ? 'ذیلیے زمرہ' : 'subcategories'}
+                </Badge>
                 {getSubcategories(category.id).length > 0 && (
-                  <div className="mt-4 space-y-2 border-t pt-4">
-                    {getSubcategories(category.id).map(subcat => (
-                      <div key={subcat.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                        <div className="flex items-center space-x-2">
-                          <FolderOpen className="h-4 w-4" />
-                          <span className="text-sm font-medium">
-                            {subcat.name[language as keyof typeof subcat.name] || subcat.name.en}
-                          </span>
-                        </div>
-                        <Badge variant="outline" className="text-xs">
-                          {language === 'ur' ? 'ذیلیہ' : 'Subcategory'}
-                        </Badge>
-                      </div>
-                    ))}
-                  </div>
+                  <ChevronDown className="h-4 w-4" />
                 )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+              </div>
+              
+              {getSubcategories(category.id).length > 0 && (
+                <div className="mt-4 space-y-2 border-t pt-4">
+                  {getSubcategories(category.id).map(subcat => (
+                    <div key={subcat.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                      <div className="flex items-center space-x-2">
+                        <FolderOpen className="h-4 w-4" />
+                        <span className="text-sm font-medium">
+                          {subcat.name[language as keyof typeof subcat.name] || subcat.name.en}
+                        </span>
+                      </div>
+                      <Badge variant="outline" className="text-xs">
+                        {language === 'ur' ? 'ذیلیہ' : 'Subcategory'}
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
     </div>
   )

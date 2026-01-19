@@ -21,7 +21,6 @@ const ArticleDetail = () => {
 
   // Get content based on current language with fallback to Urdu
   const title = article?.title[language] || article?.title.ur;
-  const excerpt = article?.excerpt[language] || article?.excerpt.ur;
   const content = article?.content[language] || article?.content.ur;
   const author = article?.author[language] || article?.author.ur;
   const readTime = article?.readTime[language] || article?.readTime.ur;
@@ -110,7 +109,7 @@ const ArticleDetail = () => {
                   />
                 </div>
                 <div className="prose max-w-none">
-                  {content.split("\n\n").map((paragraph, index) => (
+                  {content?.split("\n\n").map((paragraph, index) => (
                     <p
                       key={index}
                       className="text-foreground/90 leading-loose mb-6 text-lg"

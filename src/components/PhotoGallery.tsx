@@ -1,14 +1,15 @@
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, X, Maximize2, Download } from "lucide-react";
+import { ChevronLeft, ChevronRight, Maximize2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useLanguage } from "@/hooks/useLanguage";
 import LazyImage from "@/components/LazyImage";
+import { getText, MultilingualText } from "@/types/multilingual";
 
 interface Photo {
   id: string;
   url: string;
-  caption: { ur: string; en: string };
+  caption: MultilingualText;
   credit?: string;
   date?: string;
 }
@@ -17,20 +18,15 @@ interface PhotoGalleryProps {
   photos: Photo[];
   title?: string;
   variant?: "grid" | "slider" | "masonry";
-  autoPlay?: boolean;
-  interval?: number;
 }
 
 const PhotoGallery = ({ 
   photos, 
   title, 
-  variant = "grid", 
-  autoPlay = false,
-  interval = 3000 
+  variant = "grid"
 }: PhotoGalleryProps) => {
   const { t, language, isRTL } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const nextPhoto = () => {
     setCurrentIndex((prev) => (prev + 1) % photos.length);
@@ -75,7 +71,7 @@ const PhotoGallery = ({
           {/* Main Image */}
           <LazyImage
             src={photos[currentIndex].url}
-            alt={photos[currentIndex].caption[language]}
+            alt={getText(photos[currentIndex].caption, language)}
             className="w-full h-full object-contain"
           />
           
@@ -104,7 +100,7 @@ const PhotoGallery = ({
           {/* Image Info Overlay */}
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
             <h4 className="text-white font-medium mb-1">
-              {photos[currentIndex].caption[language]}
+              {getText(photos[currentIndex].caption, language)}
             </h4>
             {photos[currentIndex].credit && (
               <p className="text-white/70 text-sm">
@@ -137,7 +133,7 @@ const PhotoGallery = ({
                 <div className="relative w-full h-full">
                   <LazyImage
                     src={photos[currentIndex].url}
-                    alt={photos[currentIndex].caption[language]}
+                    alt={getText(photos[currentIndex].caption, language)}
                     className="w-full h-full object-contain"
                   />
                 </div>
@@ -161,7 +157,7 @@ const PhotoGallery = ({
               >
                 <LazyImage
                   src={photo.url}
-                  alt={photo.caption[language]}
+                  alt={getText(photo.caption, language)}
                   className="w-full h-full object-cover"
                 />
               </button>
@@ -180,14 +176,14 @@ const PhotoGallery = ({
         )}
         
         <div className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4 space-y-4">
-          {photos.map((photo, index) => (
+          {photos.map((photo) => (
             <div
               key={photo.id}
               className="break-inside-avoid group relative overflow-hidden rounded-lg border border-border hover:shadow-lg transition-all duration-300"
             >
               <LazyImage
                 src={photo.url}
-                alt={photo.caption[language]}
+                alt={getText(photo.caption, language)}
                 className="w-full object-cover"
               />
               
@@ -195,7 +191,7 @@ const PhotoGallery = ({
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                   <p className="text-white text-sm line-clamp-2">
-                    {photo.caption[language]}
+                    {getText(photo.caption, language)}
                   </p>
                   {photo.credit && (
                     <p className="text-white/70 text-xs">
@@ -228,7 +224,7 @@ const PhotoGallery = ({
                       <div className="relative w-full h-full">
                         <LazyImage
                           src={photo.url}
-                          alt={photo.caption[language]}
+                          alt={getText(photo.caption, language)}
                           className="w-full h-full object-contain"
                         />
                       </div>
@@ -251,14 +247,14 @@ const PhotoGallery = ({
       )}
       
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {photos.map((photo, index) => (
+        {photos.map((photo) => (
           <div
             key={photo.id}
             className="group relative aspect-square overflow-hidden rounded-lg border border-border hover:shadow-lg transition-all duration-300"
           >
             <LazyImage
               src={photo.url}
-              alt={photo.caption[language]}
+              alt={getText(photo.caption, language)}
               className="w-full h-full object-cover"
             />
             
@@ -266,7 +262,7 @@ const PhotoGallery = ({
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <div className="absolute bottom-0 left-0 right-0 p-3">
                 <p className="text-white text-sm line-clamp-2">
-                  {photo.caption[language]}
+                  {getText(photo.caption, language)}
                 </p>
                 {photo.credit && (
                   <p className="text-white/70 text-xs">
@@ -299,7 +295,7 @@ const PhotoGallery = ({
                     <div className="relative w-full h-full">
                       <LazyImage
                         src={photo.url}
-                        alt={photo.caption[language]}
+                        alt={getText(photo.caption, language)}
                         className="w-full h-full object-contain"
                       />
                     </div>

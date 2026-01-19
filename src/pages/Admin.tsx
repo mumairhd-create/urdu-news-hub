@@ -18,7 +18,7 @@ import { Login } from "@/components/Login"
 import { CategoryManager } from "@/components/CategoryManager"
 
 const Admin = () => {
-  const { language, t } = useLanguage();
+  const { language } = useLanguage();
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [articlesList, setArticlesList] = useState<NewsArticle[]>([]);
@@ -28,8 +28,8 @@ const Admin = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("articles");
   const [formData, setFormData] = useState({
-    title: { ur: "", en: "", ps: undefined },
-    content: { ur: "", en: "", ps: undefined },
+    title: { ur: "", en: "", ps: "" },
+    content: { ur: "", en: "", ps: "" },
     category_id: "",
     author: "",
     published_at: ""
@@ -154,7 +154,7 @@ const Admin = () => {
     totalArticles: articlesList.length,
     featuredArticles: 0, // Will be added later
     totalCategories: categoriesList.length,
-    totalViews: articlesList.reduce((acc, article) => acc + Math.floor(Math.random() * 10000), 0)
+    totalViews: articlesList.reduce((acc) => acc + Math.floor(Math.random() * 10000), 0)
   };
 
   if (loading) {

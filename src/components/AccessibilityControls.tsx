@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Minus, Plus, RotateCcw, Eye, Type, Palette } from "lucide-react";
+import { Minus, Plus, RotateCcw, Eye, Type } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -9,7 +9,7 @@ interface AccessibilityControlsProps {
 }
 
 const AccessibilityControls = ({ className = "" }: AccessibilityControlsProps) => {
-  const { t, language, isRTL } = useLanguage();
+  const { t } = useLanguage();
   const [fontSize, setFontSize] = useState(16);
   const [highContrast, setHighContrast] = useState(false);
   const [readingMode, setReadingMode] = useState(false);
