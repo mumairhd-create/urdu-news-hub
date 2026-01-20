@@ -101,7 +101,7 @@ const EnhancedSearch = () => {
     }
   };
 
-  const handleFilterChange = (key: keyof SearchFilters, value: any) => {
+  const handleFilterChange = (key: keyof SearchFilters, value: string | boolean | string[]) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
@@ -226,7 +226,7 @@ const EnhancedSearch = () => {
                     <label className="text-sm font-medium mb-2 block">
                       {t("category") || "Category"}
                     </label>
-                    <Select value={filters.category_id || ''} onValueChange={(value) => handleFilterChange('category_id', value || undefined)}>
+                    <Select value={filters.category_id || ''} onValueChange={(value) => handleFilterChange('category_id', value || '')}>
                       <SelectTrigger>
                         <SelectValue placeholder={t("selectCategory") || "Select category"} />
                       </SelectTrigger>
