@@ -12,8 +12,7 @@ interface LoginProps {
 
 export function Login({ onLogin }: LoginProps) {
   const { language } = useLanguage()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [code, setCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -23,11 +22,11 @@ export function Login({ onLogin }: LoginProps) {
     setError('')
 
     try {
-      const user = await auth.login(email, password)
-      if (user?.email) {
+      const user = await auth.loginWithCode(code)
+      if (user?.id) {
         onLogin({
           id: user.id,
-          email: user.email,
+          email: user.email || 'admin@umarmedia.dev',
           role: 'admin'
         })
       }
@@ -53,28 +52,20 @@ export function Login({ onLogin }: LoginProps) {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="email">
-                {language === 'ur' ? 'ای میل' : 'Email'}
+              <Label htmlFor="code">
+                {language === 'ur' ? '6 ڈیجٹ کوڈ' : '6 Digit Code'}
               </Label>
               <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="umarmedia@umar.com"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">
-                {language === 'ur' ? 'پاس ورڈ' : 'Password'}
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="•••••••••"
+                id="code"
+                type="text"
+                value={code}
+                onChange={(e) => {
+                  const value = e.target.value.replace(/\D/g, '').slice(0, 6)
+                  setCode(value)
+                }}
+                placeholder="123456"
+                maxLength={6}
+                pattern="\d{6}"
                 required
               />
             </div>
@@ -86,7 +77,7 @@ export function Login({ onLogin }: LoginProps) {
             <Button 
               type="submit" 
               className="w-full" 
-              disabled={loading}
+              disabled={loading || code.length !== 6}
             >
               {loading ? (
                 language === 'ur' ? 'لاگ ان ہو رہا ہے...' : 'Logging in...'
@@ -97,13 +88,10 @@ export function Login({ onLogin }: LoginProps) {
           </form>
           <div className="mt-4 text-center text-sm text-gray-600">
             <p>
-              {language === 'ur' ? 'ڈیفالٹ کریڈنشیلز:' : 'Default Credentials:'}
+              {language === 'ur' ? 'ڈیفالٹ کوڈ:' : 'Default Code:'}
             </p>
             <p className="font-mono text-xs mt-1">
-              Email: umarmedia@umar.com
-            </p>
-            <p className="font-mono text-xs">
-              Password: umar4343
+              123456
             </p>
           </div>
         </CardContent>

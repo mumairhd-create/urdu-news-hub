@@ -26,12 +26,14 @@ const DEMO_USERS = {
   admin: {
     email: 'admin@umarmedia.dev',
     password: 'admin123',
-    role: 'admin'
+    role: 'admin',
+    code: '123456'
   },
   user: {
     email: 'user@umarmedia.dev',
     password: 'user123',
-    role: 'user'
+    role: 'user',
+    code: '654321'
   }
 };
 
@@ -43,6 +45,10 @@ const validateEmail = (email: string): boolean => {
 
 const validatePassword = (password: string): boolean => {
   return password.length >= 6;
+};
+
+const validateCode = (code: string): boolean => {
+  return /^\d{6}$/.test(code);
 };
 
 // Sanitize input
@@ -92,6 +98,50 @@ export const auth = {
       }
       
       throw new Error('Invalid credentials');
+    }
+    
+    // Production implementation would go here
+    // For now, throw error to indicate production auth needed
+    throw new Error('Authentication service not configured for production');
+  },
+
+  // Login with 6-digit code
+  async loginWithCode(code: string) {
+    // Input validation
+    if (!validateCode(code)) {
+      throw new Error('Code must be exactly 6 digits');
+    }
+    
+    const sanitizedCode = sanitizeInput(code);
+    
+    // Demo mode for development
+    if (DEMO_MODE) {
+      const adminUser = DEMO_USERS.admin;
+      const regularUser = DEMO_USERS.user;
+      
+      if (sanitizedCode === adminUser.code) {
+        const demoUser: AuthUser = {
+          id: 'demo-admin-id',
+          email: adminUser.email,
+          role: adminUser.role,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        return demoUser;
+      }
+      
+      if (sanitizedCode === regularUser.code) {
+        const demoUser: AuthUser = {
+          id: 'demo-user-id',
+          email: regularUser.email,
+          role: regularUser.role,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+        return demoUser;
+      }
+      
+      throw new Error('Invalid code');
     }
     
     // Production implementation would go here
