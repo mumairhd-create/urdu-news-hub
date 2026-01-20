@@ -11,14 +11,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { useLanguage } from "@/hooks/useLanguage"
+import { auth, AuthUser } from "@/lib/auth"
 import { database, NewsArticle, Category } from "@/lib/database"
 import { Plus, Edit, Trash2, Eye, Settings, BarChart3, FileText, Users, TrendingUp, LogOut } from "lucide-react"
+import { Login } from "@/components/Login"
 import { CategoryManager } from "@/components/CategoryManager"
-import { useAuth } from "@/lib/authSystem"
 
 const Admin = () => {
   const { language } = useLanguage();
-  const { user, logout } = useAuth();
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [articlesList, setArticlesList] = useState<NewsArticle[]>([]);
   const [categoriesList, setCategoriesList] = useState<Category[]>([]);
@@ -35,16 +36,24 @@ const Admin = () => {
   });
 
   useEffect(() => {
-    // Load data if user is authenticated
-    if (user) {
-      loadData();
-    } else {
-      setLoading(false);
-    }
-  }, [user]);
+    // Check authentication
+    const { subscription } = auth.onAuthStateChange((authUser) => {
+      setUser(authUser);
+      if (authUser) {
+        loadData();
+      } else {
+        setLoading(false);
+      }
+    });
 
-  const handleLogout = () => {
-    logout();
+    return () => {
+      subscription.unsubscribe()
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    await auth.logout();
+    setUser(null);
   };
 
   const loadData = async () => {
@@ -87,7 +96,7 @@ const Admin = () => {
         ps: typeof article.content === 'string' ? '' : (article.content?.ps || '')
       },
       category_id: article.category_id,
-      author: article.author,
+      author: typeof article.author === 'string' ? article.author : (article.author?.en || ''),
       published_at: article.published_at
     });
     setIsEditDialogOpen(true);
@@ -159,24 +168,11 @@ const Admin = () => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <Login onLogin={setUser} />;
   }
 
   if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">Authentication required</p>
-          <Button onClick={() => window.location.href = '/login'} className="mt-4">
-            Go to Login
-          </Button>
-        </div>
-      </div>
-    );
+    return <Login onLogin={setUser} />;
   }
 
   return (
