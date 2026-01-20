@@ -28,11 +28,6 @@ const DEMO_USERS = {
     password: 'admin123',
     role: 'admin'
   },
-  editor: {
-    email: 'editor@umarmedia.dev',
-    password: 'editor123',
-    role: 'editor'
-  },
   user: {
     email: 'user@umarmedia.dev',
     password: 'user123',
@@ -72,7 +67,6 @@ export const auth = {
     // Demo mode for development
     if (DEMO_MODE) {
       const adminUser = DEMO_USERS.admin;
-      const editorUser = DEMO_USERS.editor;
       const regularUser = DEMO_USERS.user;
       
       if (sanitizedEmail === adminUser.email && password === adminUser.password) {
@@ -80,17 +74,6 @@ export const auth = {
           id: 'demo-admin-id',
           email: sanitizedEmail,
           role: adminUser.role,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        };
-        return demoUser;
-      }
-      
-      if (sanitizedEmail === editorUser.email && password === editorUser.password) {
-        const demoUser: AuthUser = {
-          id: 'demo-editor-id',
-          email: sanitizedEmail,
-          role: editorUser.role,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         };
@@ -129,7 +112,7 @@ export const auth = {
   },
 
   // Sign up function with validation
-  async signUp(email: string, password: string, role: 'admin' | 'editor' | 'user' = 'user') {
+  async signUp(email: string, password: string, role: 'admin' | 'user' = 'user') {
     // Input validation
     if (!validateEmail(email)) {
       throw new Error('Invalid email format');
@@ -228,7 +211,7 @@ export const auth = {
   },
 
   // Check if user has specific role
-  async hasRole(userId: string, requiredRole: 'admin' | 'editor' | 'user'): Promise<boolean> {
+  async hasRole(userId: string, requiredRole: 'admin' | 'user'): Promise<boolean> {
     if (!userId || userId.trim() === '') {
       return false;
     }
@@ -246,13 +229,13 @@ export const auth = {
   },
 
   // Update user role
-  async updateRole(userId: string, newRole: 'admin' | 'editor' | 'user'): Promise<Profile> {
+  async updateRole(userId: string, newRole: 'admin' | 'user'): Promise<Profile> {
     // Input validation
     if (!userId || userId.trim() === '') {
       throw new Error('User ID is required');
     }
     
-    if (!['admin', 'editor', 'user'].includes(newRole)) {
+    if (!['admin', 'user'].includes(newRole)) {
       throw new Error('Invalid role specified');
     }
     

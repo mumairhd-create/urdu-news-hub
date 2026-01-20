@@ -11,11 +11,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { useLanguage } from "@/hooks/useLanguage"
-import { AuthUser } from "@/lib/auth"
+import { auth, AuthUser } from "@/lib/auth"
 import { database, NewsArticle, Category } from "@/lib/database"
-import { safeSecureStorage, safeInitializeSecureCode } from '@/lib/safeAuth'
-import { Plus, Edit, Trash2, Eye, Settings, BarChart3, FileText, Users, TrendingUp, LogOut, Key } from "lucide-react"
-import { SimpleLogin } from "@/components/SimpleLogin"
+import { Plus, Edit, Trash2, Eye, Settings, BarChart3, FileText, Users, TrendingUp, LogOut } from "lucide-react"
+import { Login } from "@/components/Login"
 import { CategoryManager } from "@/components/CategoryManager"
 
 const Admin = () => {
@@ -36,38 +35,24 @@ const Admin = () => {
     published_at: ""
   });
 
-  // Initialize secure authentication and check existing session
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        // Initialize secure code system
-        safeInitializeSecureCode();
-        
-        // Check for existing valid session
-        const session = safeSecureStorage.getSession();
-        if (session) {
-          setUser({
-            id: session.user.id,
-            email: session.user.email,
-            role: session.user.role,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
-          await loadData();
-        }
-      } catch (error) {
-        console.error('Auth initialization failed:', error);
-      } finally {
+    // Check authentication
+    const { subscription } = auth.onAuthStateChange((authUser) => {
+      setUser(authUser);
+      if (authUser) {
+        loadData();
+      } else {
         setLoading(false);
       }
-    };
+    });
 
-    initializeAuth();
+    return () => {
+      subscription.unsubscribe()
+    };
   }, []);
 
-
   const handleLogout = async () => {
-    safeSecureStorage.clearSession();
+    await auth.logout();
     setUser(null);
   };
 
@@ -111,7 +96,7 @@ const Admin = () => {
         ps: typeof article.content === 'string' ? '' : (article.content?.ps || '')
       },
       category_id: article.category_id,
-      author: article.author,
+      author: typeof article.author === 'string' ? article.author : (article.author?.en || ''),
       published_at: article.published_at
     });
     setIsEditDialogOpen(true);
@@ -183,11 +168,11 @@ const Admin = () => {
   };
 
   if (loading) {
-    return <SimpleLogin onLogin={setUser} />;
+    return <Login onLogin={setUser} />;
   }
 
   if (!user) {
-    return <SimpleLogin onLogin={setUser} />;
+    return <Login onLogin={setUser} />;
   }
 
   return (
@@ -451,10 +436,7 @@ const Admin = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => {
-                            const url = `${window.location.origin}/article/${article.id}`;
-                            window.open(url, '_blank', 'noopener,noreferrer');
-                          }}
+                          onClick={() => window.open(`/article/${article.id}`, '_blank')}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -515,35 +497,6 @@ const Admin = () => {
                 {language === "ur" ? "ترتیبات محفوظ کریں" : "Save Settings"}
               </Button>
             </div>
-
-            {/* Login Code Info - Hidden */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Key className="h-5 w-5" />
-                  {language === "ur" ? "لاگ ان کوڈ معلومات" : "Login Code Info"}
-                </CardTitle>
-                <CardDescription>
-                  {language === "ur" ? "ایڈمن لاگ ان کوڈ" : "Admin login code"}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-                  <p className="text-yellow-800 text-sm">
-                    {language === "ur" ? "سیکیورٹی کی وجہ سے کوڈ چھپا ہوا ہے - براؤزر انسپکٹر سے بھی نہیں دیکھا جا سکتا" : "Code hidden for security - cannot be viewed even in browser inspector"}
-                  </p>
-                </div>
-
-                <div className="text-center text-xs text-muted-foreground">
-                  <p>
-                    {language === "ur" ? "صرف ایڈمن کو کوڈ معلوم ہے" : "Only admin knows the code"}
-                  </p>
-                  <p className="mt-1">
-                    {language === "ur" ? "کوڈ تبدیل نہیں کیا جا سکتا" : "Code cannot be changed"}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
 
             <Card>
               <CardHeader>
