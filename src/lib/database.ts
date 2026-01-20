@@ -1,3 +1,67 @@
+// Enhanced database implementation with Supabase integration
+// Automatically switches between real Supabase and mock data
+
+import { realDatabase, testDatabaseConnection } from './supabaseDatabase';
+
+// Export the same interface but with real backend support
+export const database = {
+  // Categories
+  async getCategories() {
+    return await realDatabase.getCategories();
+  },
+
+  async createCategory(category: Omit<Category, 'id' | 'created_at' | 'updated_at'>) {
+    return await realDatabase.createCategory(category);
+  },
+
+  async updateCategory(id: string, updates: Partial<Category>) {
+    return await realDatabase.updateCategory(id, updates);
+  },
+
+  async deleteCategory(id: string) {
+    return await realDatabase.deleteCategory(id);
+  },
+
+  // Articles
+  async getNewsArticles(options?: {
+    limit?: number;
+    category?: string;
+    featured?: boolean;
+    offset?: number;
+  }) {
+    return await realDatabase.getNewsArticles(options);
+  },
+
+  async createNewsArticle(article: Omit<NewsArticle, 'id' | 'created_at' | 'updated_at'>) {
+    return await realDatabase.createNewsArticle(article);
+  },
+
+  async updateNewsArticle(id: string, updates: Partial<NewsArticle>) {
+    return await realDatabase.updateNewsArticle(id, updates);
+  },
+
+  async deleteNewsArticle(id: string) {
+    return await realDatabase.deleteNewsArticle(id);
+  },
+
+  async searchNews(query: string, options?: {
+    category?: string;
+    tags?: string[];
+    limit?: number;
+  }) {
+    return await realDatabase.searchNews(query, options);
+  }
+};
+
+// Test connection on app load
+testDatabaseConnection().then(isConnected => {
+  if (isConnected) {
+    console.log('🟢 Using Supabase real database');
+  } else {
+    console.log('🟡 Using mock database (fallback)');
+  }
+});
+
 // Enhanced mock database implementation with better error handling and more realistic data
 // This replaces Supabase with local data and mock functions
 
@@ -243,7 +307,7 @@ const mockArticles: NewsArticle[] = [
   }
 ];
 
-export const database = {
+export const mockDatabase = {
   // Enhanced Categories with error handling
   async getCategories(): Promise<Category[]> {
     try {
