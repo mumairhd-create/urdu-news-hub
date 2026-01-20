@@ -100,7 +100,7 @@ const TrendingTopics = () => {
       case "down":
         return <TrendingUp className="h-3 w-3 text-red-500 rotate-180" />;
       default:
-        return <div className="h-3 w-3 bg-gray-400 rounded-full" />;
+        return <div className="h-3 w-3 bg-muted-foreground rounded-full" />;
     }
   };
 

@@ -37,9 +37,9 @@ const Admin = () => {
 
   useEffect(() => {
     // Check authentication
-    const { subscription } = auth.onAuthStateChange((user) => {
-      setUser(user);
-      if (user) {
+    const { subscription } = auth.onAuthStateChange((authUser) => {
+      setUser(authUser);
+      if (authUser) {
         loadData();
       } else {
         setLoading(false);
@@ -86,17 +86,17 @@ const Admin = () => {
     setSelectedArticle(article);
     setFormData({
       title: {
-        ur: article.title.ur || '',
-        en: article.title.en || '',
-        ps: article.title.ps || ''
+        ur: typeof article.title === 'string' ? article.title : (article.title?.ur || ''),
+        en: typeof article.title === 'string' ? article.title : (article.title?.en || ''),
+        ps: typeof article.title === 'string' ? '' : (article.title?.ps || '')
       },
       content: {
-        ur: article.content.ur || '',
-        en: article.content.en || '',
-        ps: article.content.ps || ''
+        ur: typeof article.content === 'string' ? article.content : (article.content?.ur || ''),
+        en: typeof article.content === 'string' ? article.content : (article.content?.en || ''),
+        ps: typeof article.content === 'string' ? '' : (article.content?.ps || '')
       },
       category_id: article.category_id,
-      author: article.author,
+      author: typeof article.author === 'string' ? article.author : (article.author?.en || ''),
       published_at: article.published_at
     });
     setIsEditDialogOpen(true);
@@ -150,9 +150,19 @@ const Admin = () => {
     }
   };
 
+  const getArticleTitle = (article: NewsArticle): string => {
+    if (typeof article.title === 'string') return article.title;
+    return article.title?.[language as keyof typeof article.title] || article.title?.en || '';
+  };
+
+  const getArticleContent = (article: NewsArticle): string => {
+    if (typeof article.content === 'string') return article.content;
+    return article.content?.[language as keyof typeof article.content] || article.content?.en || '';
+  };
+
   const stats = {
     totalArticles: articlesList.length,
-    featuredArticles: 0, // Will be added later
+    featuredArticles: 0,
     totalCategories: categoriesList.length,
     totalViews: articlesList.reduce((acc) => acc + Math.floor(Math.random() * 10000), 0)
   };
@@ -166,14 +176,14 @@ const Admin = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6" dir={language === "ur" ? "rtl" : "ltr"}>
+    <div className="min-h-screen bg-muted p-6" dir={language === "ur" ? "rtl" : "ltr"}>
       <div className="max-w-7xl mx-auto">
         <div className="mb-8 flex justify-between items-center">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-4xl font-bold text-foreground mb-2">
               {language === "ur" ? "ایڈمن پینل" : "Admin Panel"}
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               {language === "ur" ? "نیوز ہب کی انتظامیہ" : "News Hub Management"}
             </p>
           </div>
@@ -271,8 +281,8 @@ const Admin = () => {
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
                     {/* Urdu */}
-                    <div className="space-y-2 p-4 bg-gray-50 rounded">
-                      <h3 className="font-medium text-gray-900">اردو</h3>
+                    <div className="space-y-2 p-4 bg-muted rounded">
+                      <h3 className="font-medium text-foreground">اردو</h3>
                       <div>
                         <Label htmlFor="title_ur">عنوان</Label>
                         <Input
@@ -303,8 +313,8 @@ const Admin = () => {
                     </div>
                     
                     {/* English */}
-                    <div className="space-y-2 p-4 bg-gray-50 rounded">
-                      <h3 className="font-medium text-gray-900">English</h3>
+                    <div className="space-y-2 p-4 bg-muted rounded">
+                      <h3 className="font-medium text-foreground">English</h3>
                       <div>
                         <Label htmlFor="title_en">Title</Label>
                         <Input
@@ -333,8 +343,8 @@ const Admin = () => {
                     </div>
                     
                     {/* Pashto */}
-                    <div className="space-y-2 p-4 bg-gray-50 rounded">
-                      <h3 className="font-medium text-gray-900">پښتو</h3>
+                    <div className="space-y-2 p-4 bg-muted rounded">
+                      <h3 className="font-medium text-foreground">پښتو</h3>
                       <div>
                         <Label htmlFor="title_ps">نوم</Label>
                         <Input
@@ -411,10 +421,10 @@ const Admin = () => {
                     <div className="flex justify-between items-start">
                       <div>
                         <CardTitle className="text-lg">
-                          {article.title[language as keyof typeof article.title] || article.title.en}
+                          {getArticleTitle(article)}
                         </CardTitle>
                         <CardDescription>
-                          {article.content[language as keyof typeof article.content]?.substring(0, 150) || ''}...
+                          {getArticleContent(article).substring(0, 150)}...
                         </CardDescription>
                         <div className="flex items-center space-x-2 mt-2">
                           <Badge variant="secondary">
@@ -543,8 +553,8 @@ const Admin = () => {
             </DialogHeader>
             <div className="grid gap-4 py-4">
               {/* Urdu */}
-              <div className="space-y-2 p-4 bg-gray-50 rounded">
-                <h3 className="font-medium text-gray-900">اردو</h3>
+              <div className="space-y-2 p-4 bg-muted rounded">
+                <h3 className="font-medium text-foreground">اردو</h3>
                 <div>
                   <Label htmlFor="editTitle_ur">عنوان</Label>
                   <Input
@@ -573,8 +583,8 @@ const Admin = () => {
               </div>
               
               {/* English */}
-              <div className="space-y-2 p-4 bg-gray-50 rounded">
-                <h3 className="font-medium text-gray-900">English</h3>
+              <div className="space-y-2 p-4 bg-muted rounded">
+                <h3 className="font-medium text-foreground">English</h3>
                 <div>
                   <Label htmlFor="editTitle_en">Title</Label>
                   <Input
@@ -601,8 +611,8 @@ const Admin = () => {
               </div>
               
               {/* Pashto */}
-              <div className="space-y-2 p-4 bg-gray-50 rounded">
-                <h3 className="font-medium text-gray-900">پښتو</h3>
+              <div className="space-y-2 p-4 bg-muted rounded">
+                <h3 className="font-medium text-foreground">پښتو</h3>
                 <div>
                   <Label htmlFor="editTitle_ps">نوم</Label>
                   <Input
