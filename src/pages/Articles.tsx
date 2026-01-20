@@ -15,7 +15,7 @@ const Articles = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const { t, language } = useLanguage();
   
   const selectedCategory = searchParams.get("category") || "all";
@@ -29,7 +29,7 @@ const Articles = () => {
       : newsArticle.title,
     excerpt: typeof newsArticle.excerpt === 'string'
       ? { ur: newsArticle.excerpt, en: newsArticle.excerpt, ps: newsArticle.excerpt }
-      : newsArticle.excerpt || { ur: newsArticle.content.toString().substring(0, 150), en: newsArticle.content.toString().substring(0, 150) },
+      : newsArticle.excerpt || { ur: (typeof newsArticle.content === 'string' ? newsArticle.content : newsArticle.content?.ur || '').substring(0, 150), en: (typeof newsArticle.content === 'string' ? newsArticle.content : newsArticle.content?.en || '').substring(0, 150) },
     content: typeof newsArticle.content === 'string'
       ? { ur: newsArticle.content, en: newsArticle.content, ps: newsArticle.content }
       : newsArticle.content,
@@ -57,7 +57,7 @@ const Articles = () => {
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
-        setLoading(false);
+        setIsLoading(false);
       }
     };
     loadData();
@@ -93,7 +93,6 @@ const Articles = () => {
 
   const {
     data,
-    isLoading,
     error,
     resetData
   } = useInfiniteData(convertedArticles, fetchArticles);
@@ -140,7 +139,7 @@ const Articles = () => {
               )}
 
               {/* No Results */}
-              {!isLoading && !loading && data.items.length === 0 && (
+              {!isLoading && data.items.length === 0 && (
                 <div className="text-center py-16">
                   <p className="text-lg text-muted-foreground mb-4">{t("noArticlesFound")}</p>
                   <button onClick={() => { setSearchQuery(""); handleCategoryChange("all"); }} className="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:bg-primary/90">{t("clearFilters")}</button>
@@ -148,7 +147,7 @@ const Articles = () => {
               )}
 
               {/* Loading Indicator */}
-              {(isLoading || loading) && (
+              {isLoading && (
                 <div className="text-center py-8">
                   <div className="inline-flex items-center gap-2">
                     <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />

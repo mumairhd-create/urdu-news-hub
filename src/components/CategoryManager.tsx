@@ -130,8 +130,8 @@ export function CategoryManager() {
             </DialogHeader>
             <div className="space-y-4">
               {/* Urdu */}
-              <div className="space-y-2 p-4 bg-gray-50 rounded">
-                <h3 className="font-medium text-gray-900">اردو</h3>
+              <div className="space-y-2 p-4 bg-muted rounded">
+                <h3 className="font-medium text-foreground">اردو</h3>
                 <div>
                   <Label htmlFor="name_ur">نام</Label>
                   <Input
@@ -162,8 +162,8 @@ export function CategoryManager() {
               </div>
               
               {/* English */}
-              <div className="space-y-2 p-4 bg-gray-50 rounded">
-                <h3 className="font-medium text-gray-900">English</h3>
+              <div className="space-y-2 p-4 bg-muted rounded">
+                <h3 className="font-medium text-foreground">English</h3>
                 <div>
                   <Label htmlFor="name_en">Name</Label>
                   <Input
@@ -192,8 +192,8 @@ export function CategoryManager() {
               </div>
               
               {/* Pashto */}
-              <div className="space-y-2 p-4 bg-gray-50 rounded">
-                <h3 className="font-medium text-gray-900">پښتو</h3>
+              <div className="space-y-2 p-4 bg-muted rounded">
+                <h3 className="font-medium text-foreground">پښتو</h3>
                 <div>
                   <Label htmlFor="name_ps">نوم</Label>
                   <Input
@@ -231,7 +231,7 @@ export function CategoryManager() {
                   id="parent_id"
                   value={formData.parent_id}
                   onChange={(e) => setFormData({ ...formData, parent_id: e.target.value })}
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border rounded bg-background"
                 >
                   <option value="">
                     {language === 'ur' ? 'کوئی زمرہ نہیں' : 'No Parent'}
@@ -267,8 +267,8 @@ export function CategoryManager() {
           </DialogHeader>
           <div className="space-y-4">
             {/* Urdu */}
-            <div className="space-y-2 p-4 bg-gray-50 rounded">
-              <h3 className="font-medium text-gray-900">اردو</h3>
+            <div className="space-y-2 p-4 bg-muted rounded">
+              <h3 className="font-medium text-foreground">اردو</h3>
               <div>
                 <Label htmlFor="edit_name_ur">نام</Label>
                 <Input
@@ -284,8 +284,8 @@ export function CategoryManager() {
             </div>
             
             {/* English */}
-            <div className="space-y-2 p-4 bg-gray-50 rounded">
-              <h3 className="font-medium text-gray-900">English</h3>
+            <div className="space-y-2 p-4 bg-muted rounded">
+              <h3 className="font-medium text-foreground">English</h3>
               <div>
                 <Label htmlFor="edit_name_en">Name</Label>
                 <Input
@@ -320,7 +320,7 @@ export function CategoryManager() {
                   <CardTitle className="text-lg">
                     {category.name[language as keyof typeof category.name] || category.name.en}
                   </CardTitle>
-                  <CardDescription className="text-sm text-gray-600">
+                  <CardDescription className="text-sm text-muted-foreground">
                     {category.description && (category.description[language as keyof typeof category.description] || category.description.en)}
                   </CardDescription>
                 </div>
@@ -343,7 +343,7 @@ export function CategoryManager() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <Badge variant="secondary">
                   {getSubcategories(category.id).length} {language === 'ur' ? 'ذیلیے زمرہ' : 'subcategories'}
                 </Badge>
@@ -355,7 +355,7 @@ export function CategoryManager() {
               {getSubcategories(category.id).length > 0 && (
                 <div className="mt-4 space-y-2 border-t pt-4">
                   {getSubcategories(category.id).map(subcat => (
-                    <div key={subcat.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                    <div key={subcat.id} className="flex items-center justify-between p-2 bg-muted rounded">
                       <div className="flex items-center space-x-2">
                         <FolderOpen className="h-4 w-4" />
                         <span className="text-sm font-medium">
