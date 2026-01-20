@@ -19,7 +19,7 @@ export interface Profile {
 
 // Environment-based configuration
 const isDevelopment = import.meta.env.DEV;
-const DEMO_MODE = isDevelopment;
+const DEMO_MODE = true; // Force demo mode for development
 
 // Demo users for development only
 const DEMO_USERS = {
